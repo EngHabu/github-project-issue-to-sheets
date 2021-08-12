@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Importer = void 0;
 const Core = require("@actions/core");
 const rest_1 = require("@octokit/rest");
+const auth_action = require("@octokit/auth-action");
 const GitHub = require("@actions/github");
 const googleapis_1 = require("googleapis");
 class Importer {
@@ -17,7 +18,11 @@ class Importer {
                 throw new Error("🚨 Some Inputs missed. Please check project README.");
             }
             Core.info("Auth with GitHub Token...");
-            const octokit = new rest_1.Octokit();
+            const octokitAuth = createActionAuth();
+            const authentication = await octokitAuth();
+            const octokit = new rest_1.Octokit({
+                authStrategy: authentication
+            });
             Core.info("Done.");
             Core.endGroup();
             Core.startGroup("📑 Getting all Issues in repository...");
